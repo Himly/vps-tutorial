@@ -3,7 +3,7 @@
 
 ## 1 调整时间
 
-### 1.1 查看当前系统时间
+查看当前系统时间
 
 ```sh
 date -R
@@ -16,7 +16,7 @@ timedatectl set-timezone Asia/Shanghai
 
 
 
-### 1.2 更新 Linux 软件
+## 2 更新 Linux 软件
 
 ```sh
 apt update		# 更新
@@ -28,7 +28,7 @@ apt install wget curl screen vim ufw net-tools sudo -y
 
 
 
-### 1.3 安全防护
+## 3 安全防护
 
 - 【端口】：将 SSH 远程登录端口修改为【非 22 端口】
 - 【用户名】：建立【非 root】的新用户、并禁用 root 用户 SSH 远程登录
@@ -36,7 +36,7 @@ apt install wget curl screen vim ufw net-tools sudo -y
 
 
 
-**1）将 SSH 远程登录端口修改为非 22 端口**
+### 3.1 将 SSH 修改为非 22 端口
 
 ```sh
 vim /etc/ssh/sshd_config
@@ -55,7 +55,7 @@ systemctl restart ssh.service
 
 
 
-**2）建立非 root 的新用户**
+### 3.2 建立非 root 的新用户
 
 用户标识符说明
 
@@ -69,8 +69,6 @@ cat /etc/passwd
 useradd -m tom -c tom
 # 设置 tom 用户的密码
 passwd tom
-
-
 ```
 
 相关参数说明：
@@ -100,9 +98,80 @@ tom     ALL=(ALL) NOPASSWD: ALL
 
 ![User-privilege-specification](https://raw.githubusercontent.com/Himly/vps-tutorial/master/img/User-privilege-specification.jpg)
 
-> <span style=color:red>**注意**</span>
+> <span style=color:red>**注意：**</span>
 >
 > 我要特别说明的是`NOPASSWD`这个设置，它的意思是`tom`用户临时使用`root`权限时，不用额外输入密码。**这与一般的安全建议相反**。我之所以如此推荐，是因为很多新人不顾危险坚持使用`root`账号就是因为用`root`时不用重复输入密码、觉得轻松。“两害相权取其轻”，我认为【直接用`root`用户的风险】大于【使用`sudo` 时不用输密码的风险】，所以做了以上的建议。
 >
 > 如果你希望遵守传统习惯、每次使用`sudo`时要输入密码，那这一行改成 `tom ALL=(ALL:ALL) ALL` 即可。
 
+账号切换演示：
+
+```sh
+# tom --> root
+sudo -i
+# root --> tom
+su - tom
+```
+
+
+
+### 3.3 SSH 启用 RSA 密钥验证登录
+
+**1）为普通用户申请 SSH 登录密钥对**
+
+```sh
+# 切换到普通用户 tom
+su - tom
+
+ssh-keygen -t rsa -b 4096 -C "tom@debian.localdomain" -N "123456"
+#或
+ssh-keygen \
+    -t rsa \	//指定密钥类型
+    -b 4096 \	//指定密钥长度
+    -C "azureuser@myserver" \	//添加注释，便于识别
+    -f ~/.ssh/id_rsa \			//指定密钥文件的名字
+    -N mypassphrase				//密钥密码
+    
+# 下载 id_rsa 私钥文件
+cd .ssh && ls -alh
+# 下载 id_rsa 私钥文件了吗?
+# 下载 id_rsa 私钥文件了吗?
+# 下载 id_rsa 私钥文件了吗?
+
+# 本地私钥文件
+rm -f id_rsa && ls -alh
+
+# 修改 id_rsa.pub 名字并修改为 600 权限
+mv id_rsa.pub authorized_keys && chmod 600 authorized_keys && ls -alh
+```
+
+
+
+**2）使用 RSA 密钥验证登录并禁用密码登录**
+
+```sh
+sudo vim /etc/ssh/sshd_config
+
+# 修改以下内容
+PubkeyAuthentication yes
+PasswordAuthentication no
+```
+
+
+
+**3）禁用 root 用户 SSH 远程登录**
+
+```sh
+sudo vim /etc/ssh/sshd_config
+
+# 修改以下内容
+PermitRootLogin no
+```
+
+
+
+4）重启 SSH 服务
+
+```sh
+sudo systemctl restart ssh
+```
