@@ -7,7 +7,7 @@
 
 ```sh
 date -R
-# 输入信息：Sat, 26 Jun 2021 18:03:36 +0800
+# 输出信息：Sat, 26 Jun 2021 18:03:36 +0800
 
 # 把时区设成上海
 timedatectl list-timezones | grep Shanghai
