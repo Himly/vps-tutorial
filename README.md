@@ -170,7 +170,7 @@ PermitRootLogin no
 
 
 
-4）重启 SSH 服务
+**4）重启 SSH 服务**
 
 ```sh
 sudo systemctl restart ssh
