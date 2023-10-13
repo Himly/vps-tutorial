@@ -77,8 +77,8 @@ chmod +x /usr/local/bin/docker-compose
 
 - 删除多个容器
 ```markdown
-  1. 停止所有容器运行：docker stop $(docker ps -a -q)
-  2. 删除所有停止运行的容器：docker rm $(docker ps -a -q)
+  1) 停止所有容器运行：docker stop $(docker ps -a -q)
+  2) 删除所有停止运行的容器：docker rm $(docker ps -a -q)
 ```
      
 - 启动所有容器: `docker start $(docker ps -a -q)`
