@@ -1,7 +1,3 @@
-```sh
-
-```
-
 # 1 Docker & Docker Compose
 
 - Debian / Ubuntu 更新
