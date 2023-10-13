@@ -30,7 +30,7 @@ docker --help
 ```
 
 
-## 1.2安装/更新 官方版 docker-compose
+## 1.2 安装/更新 官方版 docker-compose
 
 ```sh
 curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
