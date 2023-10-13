@@ -14,6 +14,12 @@ timedatectl list-timezones | grep Shanghai
 timedatectl set-timezone Asia/Shanghai
 ```
 
+自定义 `ll` 命令
+
+```sh
+echo "alias ll='ls -alh'" >> ~/.bashrc && source ~/.bashrc
+```
+
 
 
 ## 2 更新 Linux 软件
