@@ -25,7 +25,7 @@ echo "alias ll='ls -alh'" >> ~/.bashrc && source ~/.bashrc
 ## 2 更新 Linux 软件
 
 ```sh
-apt update		# 更新
+apt update -y		# 更新
 apt upgrade -y	# 更新 + 更新时进行废弃处理
 reboot
 
