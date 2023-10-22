@@ -1,10 +1,9 @@
-# vps-tutorial
 一些 vps 常用命令
 
-## 1 调整时间
+# 1 基本设置
+## 1.1 调整时间
 
 查看当前系统时间
-
 ```sh
 date -R
 # 输出信息：Sat, 26 Jun 2021 18:03:36 +0800
@@ -14,15 +13,12 @@ timedatectl list-timezones | grep Shanghai
 timedatectl set-timezone Asia/Shanghai
 ```
 
-自定义 `ll` 命令
-
+## 1.2 自定义 `ll` 命令
 ```sh
 echo "alias ll='ls -alh'" >> ~/.bashrc && source ~/.bashrc
 ```
 
-
-
-## 2 更新 Linux 软件
+## 1.3 更新 Linux 软件
 
 ```sh
 apt update -y		# 更新
@@ -32,14 +28,94 @@ reboot
 apt install wget curl screen vim ufw net-tools sudo -y
 ```
 
+## 1.4 自定义 DNS 地址
+```sh
+echo "nameserver 1.1.1.1" > /etc/resolv.conf
+echo "nameserver 8.8.8.8" >> /etc/resolv.conf
+echo "nameserver 2606:4700:4700::1111" >> /etc/resolv.conf
+echo "nameserver 2001:4860:4860::8888" >> /etc/resolv.conf
 
+#重启网络
+systemctl status networking
+systemctl restart networking
+```
+
+## 1.5 启用 TCP/BBR 加速
+
+- BBR-v3
+```bash
+wget -O tcpx.sh "https://github.com/ylx2016/Linux-NetSpeed/raw/master/tcpx.sh" && chmod +x tcpx.sh && ./tcpx.sh
+```
+
+> `51` —— 查看内核排序
+>
+> `32` —— 安装 **XANMOD** 官方内核(main)
+>
+> `11` —— 使用BBR+FQ加速
+
+- 查看是否为 BBR3 版本
+```bash
+depmod
+modinfo tcp_bbr
+```
+
+- 删除旧内核，再更新下grub2配置
+```bash
+dpkg --list | grep linux-image
+apt remove --purge linux-image-5.10.0-13-amd64
+apt autoremove
+apt autoclean
+update-grub2
+```
+
+## 1.6 设置vps的ip优先级
+
+- **优先级**：ipv4 > ipv6
+```sh
+#方法一
+sed -i 's/#precedence ::ffff:0:0\/96  100/precedence ::ffff:0:0\/96  100/' /etc/gai.conf
+#恢复 ipv6 优先访问
+sed -i 's/precedence ::ffff:0:0\/96  100/#precedence ::ffff:0:0\/96  100/' /etc/gai.conf
+
+#方法二
+nano /etc/gai.conf
+#去掉下面这行的注解
+precedence ::ffff:0:0/96  100
+```
+
+- 测试优先级
+```sh
+curl ip.gs
+curl ip.sb
+
+#或者
+curl test.ipw.cn
+```
+
+## 1.7 禁用 ipv6
+```sh
+ip a #查看网卡信息
+nano /etc/sysctl.conf # 修改时注意网卡名字要一一对应
+
+#一句话命令
+cat >> /etc/sysctl.conf << EOF
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+net.ipv6.conf.lo.disable_ipv6 = 1
+net.ipv6.conf.eth0.disable_ipv6 = 1
+EOF
+
+#刷新系统进程
+sysctl -p
+```
+
+---
 
 ## 3 安全防护
 
 - 【端口】：将 SSH 远程登录端口修改为【非 22 端口】
 - 【用户名】：建立【非 root】的新用户、并禁用 root 用户 SSH 远程登录
 - 【密码】：SSH 启用 RSA 密钥验证登录、同时禁用密码验证登录
-
 
 
 ### 3.1 将 SSH 修改为非 22 端口
