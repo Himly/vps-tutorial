@@ -19,8 +19,10 @@ echo "alias ll='ls -alh'" >> ~/.bashrc && source ~/.bashrc
 ```
 
 ## 1.3 更新 Linux 软件
-
 ```sh
+#显示当前主机的信息
+hostnamectl
+
 apt update -y		# 更新
 apt upgrade -y	# 更新 + 更新时进行废弃处理
 reboot
@@ -107,6 +109,12 @@ EOF
 
 #刷新系统进程
 sysctl -p
+```
+
+## 1.8 查询本机 ip
+```sh
+curl ipv4.ip.sb
+curl ipv6.ip.sb
 ```
 
 ---
